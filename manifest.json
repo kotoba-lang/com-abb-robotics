@@ -1,0 +1,767 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "abb_robotics-compat",
+  "did": "did:web:etzhayyim.com:actor:abb_robotics-compat",
+  "kind": "compat",
+  "title": "abb_robotics clean-room actor",
+  "description": "Clean-room, API-compatible manufacturing / PLM / robotics actor (abb_robotics); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreia2n4ybwzgf6xz3uafgyelnjk2tq2yagybp5uo55cflrfi3p6cdt4",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreia2n4ybwzgf6xz3uafgyelnjk2tq2yagybp5uo55cflrfi3p6cdt4",
+  "schema": "schema/abb_robotics.kotoba",
+  "tier": "L4",
+  "verified": null,
+  "entities": [
+    "Part",
+    "BOM",
+    "ChangeOrder",
+    "WorkOrder",
+    "Robot",
+    "Program"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 30,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/parts",
+          "op": "create Part"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/parts",
+          "op": "list Part"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/parts/{id}",
+          "op": "get Part"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/parts/{id}",
+          "op": "update Part"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/parts/{id}",
+          "op": "delete Part"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/boms",
+          "op": "create BOM"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/boms",
+          "op": "list BOM"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/boms/{id}",
+          "op": "get BOM"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/boms/{id}",
+          "op": "update BOM"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/boms/{id}",
+          "op": "delete BOM"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/changeorders",
+          "op": "create ChangeOrder"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/changeorders",
+          "op": "list ChangeOrder"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/changeorders/{id}",
+          "op": "get ChangeOrder"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/changeorders/{id}",
+          "op": "update ChangeOrder"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/changeorders/{id}",
+          "op": "delete ChangeOrder"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/workorders",
+          "op": "create WorkOrder"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/workorders",
+          "op": "list WorkOrder"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/workorders/{id}",
+          "op": "get WorkOrder"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/workorders/{id}",
+          "op": "update WorkOrder"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/workorders/{id}",
+          "op": "delete WorkOrder"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/robots",
+          "op": "create Robot"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/robots",
+          "op": "list Robot"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/robots/{id}",
+          "op": "get Robot"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/robots/{id}",
+          "op": "update Robot"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/robots/{id}",
+          "op": "delete Robot"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/programs",
+          "op": "create Program"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/programs",
+          "op": "list Program"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/programs/{id}",
+          "op": "get Program"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/programs/{id}",
+          "op": "update Program"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/programs/{id}",
+          "op": "delete Program"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "abb_robotics-compat",
+            "purl": "pkg:etzhayyim/abb_robotics-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "abb_robotics.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 30,
+      "tools": [
+        {
+          "name": "create_part",
+          "description": "Create a Part.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "partNumber": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "revision": {
+                "type": "string"
+              },
+              "material": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "partNumber",
+              "name"
+            ]
+          }
+        },
+        {
+          "name": "list_parts",
+          "description": "List Parts.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_part",
+          "description": "Get a Part by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_part",
+          "description": "Update a Part.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "partNumber": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "revision": {
+                "type": "string"
+              },
+              "material": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_part",
+          "description": "Delete a Part.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_b_o_m",
+          "description": "Create a BOM.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "parentPartId": {
+                "type": "string"
+              },
+              "childPartId": {
+                "type": "string"
+              },
+              "quantity": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "quantity"
+            ]
+          }
+        },
+        {
+          "name": "list_b_o_ms",
+          "description": "List BOMs.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_b_o_m",
+          "description": "Get a BOM by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_b_o_m",
+          "description": "Update a BOM.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "parentPartId": {
+                "type": "string"
+              },
+              "childPartId": {
+                "type": "string"
+              },
+              "quantity": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_b_o_m",
+          "description": "Delete a BOM.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_change_order",
+          "description": "Create a ChangeOrder.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "partId": {
+                "type": "string"
+              },
+              "number": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "number",
+              "status"
+            ]
+          }
+        },
+        {
+          "name": "list_change_orders",
+          "description": "List ChangeOrders.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_change_order",
+          "description": "Get a ChangeOrder by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_change_order",
+          "description": "Update a ChangeOrder.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "partId": {
+                "type": "string"
+              },
+              "number": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_change_order",
+          "description": "Delete a ChangeOrder.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_work_order",
+          "description": "Create a WorkOrder.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "partId": {
+                "type": "string"
+              },
+              "quantity": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "quantity",
+              "status"
+            ]
+          }
+        },
+        {
+          "name": "list_work_orders",
+          "description": "List WorkOrders.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_work_order",
+          "description": "Get a WorkOrder by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_work_order",
+          "description": "Update a WorkOrder.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "partId": {
+                "type": "string"
+              },
+              "quantity": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_work_order",
+          "description": "Delete a WorkOrder.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_robot",
+          "description": "Create a Robot.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "model": {
+                "type": "string"
+              },
+              "cellId": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "payloadKg": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "model",
+              "status"
+            ]
+          }
+        },
+        {
+          "name": "list_robots",
+          "description": "List Robots.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_robot",
+          "description": "Get a Robot by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_robot",
+          "description": "Update a Robot.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "model": {
+                "type": "string"
+              },
+              "cellId": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "payloadKg": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_robot",
+          "description": "Delete a Robot.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_program",
+          "description": "Create a Program.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "robotId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "cycleTimeMs": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "name",
+              "cycleTimeMs"
+            ]
+          }
+        },
+        {
+          "name": "list_programs",
+          "description": "List Programs.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_program",
+          "description": "Get a Program by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_program",
+          "description": "Update a Program.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "robotId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "cycleTimeMs": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_program",
+          "description": "Delete a Program.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
