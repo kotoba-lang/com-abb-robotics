@@ -10,7 +10,7 @@
   "runtime": "kotoba-wasm",
   "exec": "browser-local|donated-mesh",
   "ipfs": "ipfs://bafkreia2n4ybwzgf6xz3uafgyelnjk2tq2yagybp5uo55cflrfi3p6cdt4",
-  "schema": "schema/abb_robotics.kotoba",
+  "schema": "schema/abb_robotics.kotoba-schema",
   "tier": "L4",
   "verified": null,
   "entities": [
