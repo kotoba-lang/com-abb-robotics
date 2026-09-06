@@ -1,5 +1,5 @@
 (ns abb-robotics.paginate
-  (:export [as-int clamp-limit has-more? main]))
+  (:export [as-int clamp-limit has-more? main test-clamp-limit]))
 
 ;; Bounded pure-int slice of abb_robotics.main/paginate: the pagination
 ;; *decision* kernel only. The .cljc `paginate` stays authoritative for cursor
@@ -31,3 +31,8 @@
 
 (defn main []
   (has-more? 101 (clamp-limit (as-int 100))))
+
+(defn test-clamp-limit []
+  (and (= (clamp-limit 0) 20)
+       (= (clamp-limit 250) 100)
+       (= (clamp-limit 50) 50)))
