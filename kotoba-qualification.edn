@@ -1,1 +1,22 @@
-{:kotoba.q9.pilot/version 1, :source "src/abb_robotics/page_limit.kotoba", :oracle {:namespace abb_robotics.main, :function page-limit, :cases [-1 0 1 20 250], :expected [20 20 1 20 100]}, :effects #{}, :capabilities #{}, :consumer-cutover false, :rollback {:oracle-retained true, :action :remove-unused-pilot-source}}
+{:kotoba.q9.pilot/version 1
+ :sources ["src/abb_robotics/page_limit.kotoba"
+           "src/abb_robotics/paginate.kotoba"]
+ :oracles [{:namespace abb_robotics.main
+            :function page-limit
+            :source "src/abb_robotics/page_limit.kotoba"
+            :cases [-1 0 1 20 250]
+            :expected [20 20 1 20 100]}
+           {:namespace abb_robotics.main
+            :functions [as-int-kernel clamp-limit has-more-kernel?]
+            :source "src/abb_robotics/paginate.kotoba"
+            :main-expression [has-more-kernel? 101 [clamp-limit [as-int-kernel 100]]]
+            :expected true}]
+ :effects #{}
+ :capabilities #{}
+ :consumer-cutover false
+ :host-boundary
+ {:retained-cljc ["src/abb_robotics/main.cljc"]
+  :owns [:clock :uuid :mutable-crud-state :exceptions :maps :strings :floating-point]}
+ :rollback
+ {:oracle-retained true
+  :action :remove-pilot-source-and-continue-using-cljc-oracle}}
