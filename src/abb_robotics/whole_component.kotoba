@@ -392,9 +392,8 @@
     (string=? entity "Program") "name,cycleTimeMs"
     :else ""))
 
-;; `:coerce` as `field:kind` pairs. Credential, Document and VerificationRequest
-;; declare `{}` and answer "". Transaction's `amount:float` is the arm the
-;; aarch64 backend refuses -- see `coerce-field`.
+;; `:coerce` as `field:kind` pairs. A spec that declares `{}` answers "".
+;; A `float` arm is the one the aarch64 backend refuses -- see `coerce-field`.
 (defn coerce-table-of [entity :string] :string
   (cond
     (string=? entity "Part") ""
@@ -405,10 +404,8 @@
     (string=? entity "Program") "cycleTimeMs:int"
     :else ""))
 
-;; `:refs` as `field:entity` pairs. Five of the six specs carry
-;; `{:identityId "Part"}`, so unlike the aave sibling -- where every spec was
-;; `:refs {}` and `expand` was a fold over nothing -- this fold RUNS on the
-;; production path in `handle-get`.
+;; `:refs` as `field:entity` pairs, comma-separated. A spec with two refs
+;; makes `expand`'s fold run twice over one row.
 (defn refs-of [entity :string] :string
   (cond
     (string=? entity "Part") ""
@@ -418,6 +415,7 @@
     (string=? entity "Robot") ""
     (string=? entity "Program") "robotId:Robot"
     :else ""))
+
 
 ;; --- comma-separated name lists -------------------------------------------
 
@@ -1119,12 +1117,13 @@
 
 (defn fixture-data [sel :i64] :string
   (cond
-    (= sel 0) "{\"partNumber\":\"P-1\",\"name\":\"Bracket\"}"
-    (= sel 1) "{\"partNumber\":\"P-1\"}"
-    (= sel 2) "{\"partNumber\":\"P-1\",\"name\":\"Bracket\",\"bogus\":\"x\"}"
-    (= sel 3) "{\"model\":\"IRB-6700\",\"status\":\"idle\",\"payloadKg\":\"150.5\"}"
-    (= sel 4) "{\"quantity\":\"3\"}"
+    (= sel 0) "{\"partNumber\":\"v\",\"name\":\"v\"}"
+    (= sel 1) "{\"partNumber\":\"v\"}"
+    (= sel 2) "{\"partNumber\":\"v\",\"name\":\"v\",\"bogus\":\"x\"}"
+    (= sel 3) "{\"model\":\"v\",\"status\":\"v\",\"payloadKg\":\"1.5\"}"
+    (= sel 4) "{\"quantity\":\"v\"}"
     :else "{}"))
+
 
 (defn fixture-text [sel :i64] :string
   (cond
@@ -1196,8 +1195,8 @@
 (defn seeded-row [i :i64] :string
   (jobj (jsep (jsep (jkv "id" (string-concat "abbrobot_par_" (string-from-i64 i)))
                     (jkv-raw "revision" (string-from-i64 i)))
-              (jsep (jkv "partNumber" (string-concat "P-" (string-from-i64 i)))
-                    (jkv "name" (if (= (modulo i 2) 0) "Bracket" "Flange"))))))
+              (jsep (jkv "partNumber" "v") (jkv "name" "v")))))
+
 
 (defn seeded-store-from [store :string i :i64 n :i64] :string
   (if (>= i n)
@@ -1206,18 +1205,14 @@
 
 (defn seeded-store [n :i64] :string (seeded-store-from (store-empty) 0 n))
 
-;; A BOM row pointing at Part `abbrobot_par_<i>` through BOTH of its ref
-;; fields. This is where the port stops being a rename of the aadhaar one:
-;; every spec there carried exactly one ref, so `expand`'s fold ran with a
-;; single pair, and a fold over one is not a fold. `:refs {:parentPartId
-;; "Part" :childPartId "Part"}` makes it run twice over one row, which is the
-;; first time `refs-of`'s comma-separated list is parsed as a LIST on the
-;; production path.
+;; A BOM row pointing at the row its TWO ref fields name.
+;; Two refs make `expand`'s fold run twice over one row, which is the
+;; case `oracle-expand` selector 4 is about.
 (defn cred-row [i :i64] :string
   (jobj (jsep (jsep (jkv "id" (string-concat "abbrobot_bom_" (string-from-i64 i)))
                     (jkv "parentPartId" (string-concat "abbrobot_par_" (string-from-i64 i))))
-              (jsep (jkv "childPartId" (string-concat "abbrobot_par_" (string-from-i64 i)))
-                    (jkv-raw "quantity" (string-from-i64 i))))))
+              (jsep (jkv "childPartId" (string-concat "abbrobot_par_" (string-from-i64 i))) (jkv "quantity" "v")))))
+
 
 (defn seeded-both [n :i64] :string
   (store-put (seeded-store n) "BOM" (cred-row 1)))
@@ -1293,34 +1288,31 @@
 (defn oracle-facts [sel :i64] :i64
   (str-hash (emit-facts "Part" (seeded-row sel))))
 
-;; `refs-of` answers a REAL pair for five of the six entities, so selector 0 is
-;; the production path: a Credential row expanded through `refs-of "BOM"`
-;; against a store that holds the Part it names.
-;;
-;; The field names here are this repository's, and that is not cosmetic. The
-;; aadhaar port asked for `identityId`; carried over unchanged, every selector
-;; below would name a field BOM does not have, `expand` would fold over
-;; nothing, and all four arms would return the unexpanded record -- four green
-;; assertions measuring an empty fold. Selector 0 asks for ONE of BOM's two
-;; refs and selector 4 asks for BOTH, which is the arm no earlier pilot had.
-;; Selector 1 asks for a field that is not in `expand`, 2 points at a Part that
-;; is not in the store (the `null` arm), and 3 is an entity whose refs really
-;; are empty.
+;; Selectors 1 and 3 must collapse to the unexpanded record and 2 must
+;; differ from both; without that floor a green 0 cannot be told from a
+;; fold over nothing.
+;; Selector 4 exists because this entity declares two refs.
 (defn oracle-expand [sel :i64] :i64
   (let [store (seeded-both 3)
         rec (cred-row 1)]
     (cond
+      ;; the ref resolves
       (= sel 0) (str-hash (expand store rec "{\"expand\":\"parentPartId\"}"
                                   (refs-of "BOM")))
+      ;; a field `expand` is not asked for
       (= sel 1) (str-hash (expand store rec "{\"expand\":\"other\"}"
                                   (refs-of "BOM")))
+      ;; the ref names a row the store does not hold
       (= sel 2) (str-hash (expand store (cred-row 9) "{\"expand\":\"parentPartId\"}"
                                   (refs-of "BOM")))
+      ;; a spec with NO refs -- the fold runs over nothing
       (= sel 3) (str-hash (expand store rec "{\"expand\":\"parentPartId\"}"
                                   (refs-of "Part")))
+      ;; BOTH refs -- the fold runs twice over one row
       (= sel 4) (str-hash (expand store rec "{\"expand\":\"parentPartId,childPartId\"}"
                                   (refs-of "BOM")))
       :else (str-hash rec))))
+
 
 (defn oracle-clock [seed :i64] :i64 (str-hash (now seed)))
 

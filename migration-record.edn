@@ -72,7 +72,7 @@
    :effects #{[:cap/call :clock/now] [:cap/call :entropy/draw]}}
   :amu-compile-native
   {:command "amu compile <abs>/src/abb_robotics/whole_component.kotoba --target aarch64-macos --policy <abs>/policy.edn --output <abs>/abb_robotics.kexe"
-   :status :ok :exit 0 :bytes 237083
+   :status :ok :exit 0 :bytes 237456
    :note "com-aadhaar's is 236678 bytes from the same template with a different entity table."}
   :paths
   "Absolute. A relative path is refused with :decode / `input could not be read`,
@@ -83,7 +83,7 @@
   :main {:value 30
          :meaning "route-count: five routes per entity over six entities, computed from the entity table rather than written down."}
   :oracle-expand
-  {:values {0 253212778 1 23955074 2 458522191 3 23955074 4 728485347 5 23955074}
+  {:values {0 775932512 1 59185124 2 712015981 3 59185124 4 950504319 5 59185124}
    :reading
    "Three selectors collapse to one value, 23955074, and that is the point:
     selector 1 asks for a field that is not a ref, 3 asks against an entity
@@ -151,4 +151,33 @@
  ["No consumer cutover. main.cljc remains the oracle and nothing imports the component."
   "The parity harness covers the i64 layers and the expand fold's arity. It does NOT compare the rendered-JSON hash layers value-by-value, for the reason in :parity :method-note."
   "wasm32 was not built. Only aarch64-macos was compiled and executed."
-  "The tranche status is unchanged. One more whole-component build does not earn the soak."]}
+  "The tranche status is unchanged. One more whole-component build does not earn the soak."]
+
+ :regenerated-2026-09-10
+ {:generator "kotoba-lang scripts/gen-whole-component.cljs"
+  :why "This component was hand written. Regenerating it puts it under the same derivation as its siblings, so a future table change cannot leave a fixture behind."
+  :what-moved
+  {:oracle-expand
+   "Every value moved, because the fixtures moved: seeded-row and cred-row now
+    carry generated placeholders rather than the hand-chosen \"Bracket\" and
+    \"Flange\". The STRUCTURE is unchanged and that is what the oracle is for --
+    selectors 1, 3 and 5 still collapse to one floor, and 0, 2 and 4 are each
+    distinct from it and from each other. Selector 4 remains distinct from
+    selector 0, which is the property that matters for a two-ref entity and the
+    one com-accela cannot have."
+   :bytes "237083 -> 237456"}
+  :what-did-not-move
+  {:route-count "30, derived from the entity table rather than the fixtures"
+   :oracle-float-divergence
+   "172520021 638098242 289182519, byte-identical. That oracle calls
+    coerce-field with literal strings, so it does not depend on any fixture. It
+    is the control for this whole regeneration: if these had moved too, the
+    right conclusion would have been that the measurement changed rather than
+    the fixtures."}
+  :gained
+  "fixture-data selector 3 now carries \"payloadKg\":\"1.5\". Robot coerces
+   payloadKg to :float and does not require it, so the generator's earlier
+   :required-only fixture omitted the one field the float arm exists to
+   exercise. The hand-written fixture had it; the generator now derives it."
+  :parity "as-bool 9 of 9, page-limit 8 of 8, as-int 5 of 6 with the cohort-wide \"12abc\" divergence. Unchanged by the regeneration."}
+}
