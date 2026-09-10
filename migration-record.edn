@@ -113,8 +113,42 @@
     backend is an implementation gap, and the gap is recorded rather than
     designed around."}}
 
+ :parity
+ {:harness "q9-oracle.cljs"
+  :command "nbb --classpath src:<kotoba-lang/text>/src q9-oracle.cljs"
+  :added "2026-09-10"
+  :closes "the :not-claimed item that said the oracle-* functions were RUN but never compared value-by-value"
+  :agrees
+  {:route-count "30 on both sides, derived from the entity table rather than written down"
+   :as-int "5 of 6 selectors agree"
+   :as-bool "9 of 9 selectors agree"}
+  :disagrees
+  {:as-int-trailing-garbage
+   {:input "12abc"
+    :artifact 0
+    :oracle-under-nbb 12
+    :oracle-under-jvm 0
+    :reading
+    "This is NOT a port defect, and the harness is what made that visible. The
+     oracle's own as-int is a reader conditional whose two branches disagree
+     with each other on this input: the :cljs branch is js/parseInt, which takes
+     the leading digits and yields 12, and the :clj branch is Long/parseLong,
+     which throws and is caught, yielding 0. Both were RUN rather than read --
+     nbb gave 12, `clojure -M -e` gave 0.
+
+     The component matches the :clj branch. So `parity with the oracle` is not
+     well defined for this input until someone says which branch is normative,
+     and a harness run under nbb will report a mismatch while the same harness
+     on the JVM reports a match. Recorded rather than resolved: choosing a
+     branch is a semantic decision about the product, not a migration step."}}
+  :method-note
+  "The expand layer is compared as a COUNT of the keys the fold added, not as a
+   hash. The .kotoba hashes a rendered record, and the rendering is this port's
+   own convention, so a hash comparison there would confound a behaviour
+   difference with a layout difference."}
+
  :not-claimed
  ["No consumer cutover. main.cljc remains the oracle and nothing imports the component."
-  "No parity harness against the CLJC oracle. The oracle-* functions exist and were RUN, and their values discriminate, but they were not compared value-by-value against main.cljc in this pass."
+  "The parity harness covers the i64 layers and the expand fold's arity. It does NOT compare the rendered-JSON hash layers value-by-value, for the reason in :parity :method-note."
   "wasm32 was not built. Only aarch64-macos was compiled and executed."
   "The tranche status is unchanged. One more whole-component build does not earn the soak."]}
