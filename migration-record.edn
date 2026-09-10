@@ -1,0 +1,120 @@
+{:kotoba.lang.q9.migration-record/version 1
+ :repository "orgs/kotoba-lang/com-abb-robotics"
+ :as-of "2026-09-10"
+ :wave :wave-1
+ :disposition :partial-and-running
+ :record-author "whole-component port, third pilot in the cohort"
+
+ :why-this-repository
+ "kotoba-lang lang/q9-migration.edn :current-decision names
+  :requalify-wave-1-pilots-as-whole-component-builds as the next action, and as
+  of 2026-09-10 exactly two of the twenty pilots had a whole-component build:
+  com-aadhaar and com-aave. Two is a pattern only if the third one reproduces
+  it, so this is the third.
+
+  The oracles are the same generated actor template. Measured by diffing
+  src/aave/main.cljc against src/abb_robotics/main.cljc with the repository
+  name normalised away: they differ in the docstring and the entity-specs
+  table, and in nothing else."
+
+ :baseline-paths
+ ["src/abb_robotics/main.cljc"
+  "src/abb_robotics/page_limit.kotoba"
+  "src/abb_robotics/paginate.kotoba"
+  "src/abb_robotics/whole_component.kotoba"
+  "policy.edn"]
+
+ :classifications
+ {"src/abb_robotics/main.cljc" :retained-oracle
+  "src/abb_robotics/page_limit.kotoba" :kotoba-only
+  "src/abb_robotics/paginate.kotoba" :kotoba-only
+  "src/abb_robotics/whole_component.kotoba" :whole-component-entry
+  "policy.edn" :declared-capability-grants}
+
+ :reserved-name-collision
+ {:collides true
+  :name "query"
+  :cleared-by :rename-in-the-migrated-component
+  :detail
+  "src/abb_robotics/main.cljc declares a public `query`, which the pure
+   S-expression core reserved as a head on 2026-09-06. The migrated component
+   names the same operation store-query. The oracle is unchanged -- nothing was
+   renamed in the .cljc -- which is the second of the two options
+   lang/q9-wave1-tranche-1.edn :reserved-name-collision names, and the same one
+   com-aadhaar and com-aave took. Third pilot, same resolution."}
+
+ :what-this-pilot-exercises-that-the-earlier-two-did-not
+ "TWO refs on one spec. `:refs {:parentPartId \"Part\" :childPartId \"Part\"}`
+  on BOM. In com-aave every spec was `:refs {}` and expand folded over nothing;
+  in com-aadhaar five specs carried exactly one ref, and a fold over one is not
+  a fold. Here `refs-of` returns a comma-separated list of two pairs and expand
+  parses it as a LIST on the production path for the first time.
+
+  It is asserted by execution, not by inspection -- see :executed below."
+
+ :the-trap-this-port-walked-into
+ "The oracle-expand selectors were carried over from com-aadhaar asking for
+  `{\"expand\":\"identityId\"}`. BOM has no identityId. Left unchanged, every
+  selector would have named a field that does not exist, expand would have
+  folded over nothing, and all four arms would have returned the unexpanded
+  record -- four green assertions measuring an empty fold, in the very port
+  whose novelty is that the fold now runs twice. The field names were corrected
+  to parentPartId / childPartId and a fifth selector asking for BOTH was added.
+
+  This is the same shape as the reserved-name collision one layer up: the port
+  is mechanical enough that the parts which must NOT be mechanical are the ones
+  to check."
+
+ :builds
+ {:amu-check
+  {:command "amu check <abs>/src/abb_robotics/whole_component.kotoba --jvm-free --policy <abs>/policy.edn"
+   :status :ok :exit 0
+   :effects #{[:cap/call :clock/now] [:cap/call :entropy/draw]}}
+  :amu-compile-native
+  {:command "amu compile <abs>/src/abb_robotics/whole_component.kotoba --target aarch64-macos --policy <abs>/policy.edn --output <abs>/abb_robotics.kexe"
+   :status :ok :exit 0 :bytes 237083
+   :note "com-aadhaar's is 236678 bytes from the same template with a different entity table."}
+  :paths
+  "Absolute. A relative path is refused with :decode / `input could not be read`,
+   which reads like a malformed source rather than a path problem."}
+
+ :executed
+ {:harness "cc -O2 tools/kexe_loader.c, then KEXE_FUEL=100000000 ./kexe-loader <sym>.bin <offset> <arity> aarch64 7,23 [args]"
+  :main {:value 30
+         :meaning "route-count: five routes per entity over six entities, computed from the entity table rather than written down."}
+  :oracle-expand
+  {:values {0 253212778 1 23955074 2 458522191 3 23955074 4 728485347 5 23955074}
+   :reading
+   "Three selectors collapse to one value, 23955074, and that is the point:
+    selector 1 asks for a field that is not a ref, 3 asks against an entity
+    whose refs are empty, and 5 is the record with no expansion at all. All
+    three must be the unexpanded record and all three are.
+
+    Against that floor, selector 0 (one ref) and selector 4 (BOTH refs) are
+    different values, and different from each other. The two-ref fold folds
+    twice. Selector 2 points at a Part the store does not hold and lands on the
+    null arm, distinct again.
+
+    A run that only reported selector 4 would not be able to tell a working
+    fold from a fold over nothing."}
+  :oracle-float-divergence
+  {:values {0 172520021 1 638098242 2 289182519}
+   :reading "Distinct, so the float layer's divergence is measurable here as it is in com-aadhaar."}}
+
+ :blocked-layers
+ {:float-coercion
+  {:status :blocked
+   :reached true
+   :detail
+   "Robot declares `:coerce {:payloadKg :float}`, so this component REACHES the
+    arm com-aadhaar also reaches. `coerce-field`'s float branch preserves the
+    raw token instead of coercing, exactly as in the sibling. Not reduced to a
+    smaller predicate to make anything green: ADR-q9 says an unavailable
+    backend is an implementation gap, and the gap is recorded rather than
+    designed around."}}
+
+ :not-claimed
+ ["No consumer cutover. main.cljc remains the oracle and nothing imports the component."
+  "No parity harness against the CLJC oracle. The oracle-* functions exist and were RUN, and their values discriminate, but they were not compared value-by-value against main.cljc in this pass."
+  "wasm32 was not built. Only aarch64-macos was compiled and executed."
+  "The tranche status is unchanged. One more whole-component build does not earn the soak."]}
