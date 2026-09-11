@@ -1231,16 +1231,27 @@
     (= sel 6) (str-hash (seeded-store 2))
     :else (arr-count (store-rows (seeded-store 3) "BOM"))))
 
+;; Selector 1 must return every row and selector 2 none, on the same
+;; field; without that pair a green run cannot be told from a filter
+;; whose key this repository does not have.
+;; Selectors 3 and 4 index a non-required field that carries the row
+;; number, so they reach the one-row and the no-row cases.
 (defn oracle-filters [sel :i64] :i64
   (let [rows (store-rows (seeded-store 5) "Part")
         fields (fields-of "Part")]
     (cond
+      ;; no filter at all -- the row count itself
       (= sel 0) (arr-count (apply-filters rows "{}" fields))
-      (= sel 1) (arr-count (apply-filters rows "{\"jurisdiction\":\"IN\"}" fields))
-      (= sel 2) (arr-count (apply-filters rows "{\"jurisdiction\":\"\"}" fields))
-      (= sel 3) (arr-count (apply-filters rows "{\"externalId\":\"3\"}" fields))
-      (= sel 4) (arr-count (apply-filters rows "{\"externalId\":\"99\"}" fields))
+      ;; a required field, the value every seeded row carries
+      (= sel 1) (arr-count (apply-filters rows "{\"partNumber\":\"v\"}" fields))
+      ;; the SAME field, a value no seeded row carries
+      (= sel 2) (arr-count (apply-filters rows "{\"partNumber\":\"zzz\"}" fields))
+      ;; the row index, which is unique -- exactly one row
+      (= sel 3) (arr-count (apply-filters rows "{\"revision\":\"1\"}" fields))
+      ;; the row index, out of range -- no row
+      (= sel 4) (arr-count (apply-filters rows "{\"revision\":\"99\"}" fields))
       :else (arr-count (apply-filters rows "{\"notAField\":\"x\"}" fields)))))
+
 
 (defn oracle-paginate [n :i64 requested :i64] :i64
   (let [rows (store-rows (seeded-store n) "Part")
@@ -1253,6 +1264,10 @@
         params (jobj (jkv "starting_after" (string-concat "abbrobot_par_" (string-from-i64 after))))]
     (arr-count (paginate-cursor rows params))))
 
+;; Selector 6 is the update SUCCESS arm and must be 200; 7 is its 404.
+;; Selector 13 hashes the field selector 6 wrote, so it is meaningful
+;; only while 6 succeeds -- if 6 ever returns 400 again, 13 is hashing
+;; an absent field and will read the same in every repository.
 (defn oracle-handlers [sel :i64] :i64
   (let [store (seeded-store 2)]
     (cond
@@ -1263,7 +1278,7 @@
       (= sel 4) (as-int (field (handle-get store "Part" "abbrobot_par_0" "{}") "status"))
       (= sel 5) (as-int (field (handle-get store "Part" "nope" "{}") "status"))
       (= sel 6) (as-int (field (handle-update store "Part" "abbrobot_par_0"
-                                              "{\"jurisdiction\":\"US\"}" 1) "status"))
+                                              "{\"partNumber\":\"updated\"}" 1) "status"))
       (= sel 7) (as-int (field (handle-update store "Part" "nope" "{}" 1) "status"))
       (= sel 8) (as-int (field (handle-delete store "Part" "abbrobot_par_0") "status"))
       (= sel 9) (as-int (field (handle-delete store "Part" "nope") "status"))
@@ -1276,10 +1291,11 @@
                                         "Part"))
       (= sel 12) (as-int (field (raw-field (handle-list store "Part" "{}") "body") "total"))
       (= sel 13) (str-hash (field (raw-field (handle-update store "Part" "abbrobot_par_0"
-                                                            "{\"jurisdiction\":\"US\"}" 1)
+                                                            "{\"partNumber\":\"updated\"}" 1)
                                              "body")
-                                  "jurisdiction"))
+                                  "partNumber"))
       :else (str-hash (raw-field (handle-get store "Part" "abbrobot_par_1" "{}") "body")))))
+
 
 (defn oracle-healthz [] :i64 (str-hash (healthz)))
 
