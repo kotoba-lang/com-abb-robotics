@@ -3,7 +3,7 @@
    -- the oracle this port is a port OF -- under nbb, and print the same
    numbers the aarch64 artifact prints.
 
-     nbb --classpath src q9-oracle.cljk
+     kbb --backend sci --classpath src q9-oracle.cljk
 
    `migration-record.edn` recorded this repository's whole-component build as
    :partial-and-running with `:not-claimed` naming exactly this gap: the
