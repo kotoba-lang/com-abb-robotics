@@ -13,19 +13,19 @@
   it, so this is the third.
 
   The oracles are the same generated actor template. Measured by diffing
-  src/aave/main.cljc against src/abb_robotics/main.cljc with the repository
+  src/aave/main.cljc against src/abb_robotics/main.cljk with the repository
   name normalised away: they differ in the docstring and the entity-specs
   table, and in nothing else."
 
  :baseline-paths
- ["src/abb_robotics/main.cljc"
+ ["src/abb_robotics/main.cljk"
   "src/abb_robotics/page_limit.kotoba"
   "src/abb_robotics/paginate.kotoba"
   "src/abb_robotics/whole_component.kotoba"
   "policy.edn"]
 
  :classifications
- {"src/abb_robotics/main.cljc" :retained-oracle
+ {"src/abb_robotics/main.cljk" :retained-oracle
   "src/abb_robotics/page_limit.kotoba" :kotoba-only
   "src/abb_robotics/paginate.kotoba" :kotoba-only
   "src/abb_robotics/whole_component.kotoba" :whole-component-entry
@@ -36,7 +36,7 @@
   :name "query"
   :cleared-by :rename-in-the-migrated-component
   :detail
-  "src/abb_robotics/main.cljc declares a public `query`, which the pure
+  "src/abb_robotics/main.cljk declares a public `query`, which the pure
    S-expression core reserved as a head on 2026-09-06. The migrated component
    names the same operation store-query. The oracle is unchanged -- nothing was
    renamed in the .cljc -- which is the second of the two options
@@ -114,8 +114,8 @@
     designed around."}}
 
  :parity
- {:harness "q9-oracle.cljs"
-  :command "nbb --classpath src:<kotoba-lang/text>/src q9-oracle.cljs"
+ {:harness "q9-oracle.cljk"
+  :command "nbb --classpath src:<kotoba-lang/text>/src q9-oracle.cljk"
   :added "2026-09-10"
   :closes "the :not-claimed item that said the oracle-* functions were RUN but never compared value-by-value"
   :agrees
