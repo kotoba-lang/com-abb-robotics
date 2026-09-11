@@ -6,7 +6,7 @@ amu check src/abb_robotics/paginate.kotoba --jvm-free
 amu compile src/abb_robotics/paginate.kotoba --target wasm32 --jvm-free
 {:ok true, :target :wasm32-kotoba-v1, :output "/private/tmp/kwave-com-abb-robotics/src/abb_robotics/paginate.kotoba.wasm", :provenance-output "/private/tmp/kwave-com-abb-robotics/src/abb_robotics/paginate.kotoba.wasm.provenance.edn", :publication-output "/private/tmp/kwave-com-abb-robotics/src/abb_robotics/paginate.kotoba.wasm.publication.edn", :definitions-recompiled 4, :kotoba.compile/inputs :single-file}
 
-clojure -M:test
+kbb -M:test
 Ran 8 tests containing 100 assertions.
 0 failures, 0 errors.
 

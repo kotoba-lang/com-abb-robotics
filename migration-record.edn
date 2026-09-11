@@ -115,7 +115,7 @@
 
  :parity
  {:harness "q9-oracle.cljk"
-  :command "nbb --classpath src:<kotoba-lang/text>/src q9-oracle.cljk"
+  :command "kbb --backend sci --classpath src:<kotoba-lang/text>/src q9-oracle.cljk"
   :added "2026-09-10"
   :closes "the :not-claimed item that said the oracle-* functions were RUN but never compared value-by-value"
   :agrees
@@ -134,7 +134,7 @@
      with each other on this input: the :cljs branch is js/parseInt, which takes
      the leading digits and yields 12, and the :clj branch is Long/parseLong,
      which throws and is caught, yielding 0. Both were RUN rather than read --
-     nbb gave 12, `clojure -M -e` gave 0.
+     nbb gave 12, `kbb -M -e` gave 0.
 
      The component matches the :clj branch. So `parity with the oracle` is not
      well defined for this input until someone says which branch is normative,
